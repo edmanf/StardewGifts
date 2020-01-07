@@ -32,15 +32,14 @@ def scrape_items_to_db():
     """
         Returns a list of items
     """
-    base = "https://stardewvalleywiki.com/"
-    path = "Category:Items"
+    category_page_title = "Category:Items"
     
-    item_links = get_item_links(urljoin(base, path))
+    item_links = get_item_links(category_page_title)
     gift_reactions = get_giftable_item_reactions_from_links(item_links)
     write_gift_reactions_to_db(gift_reactions)
     
     
-def get_item_links(url):
+def get_members_from_category(category_page_title):
     """ Returns a set of item urls from this url and its sub-categories
     
     An item link is considered any link in the main content body of the
@@ -53,31 +52,37 @@ def get_item_links(url):
         ex: https://stardewvalleywiki.com/Category:Animal_Products
     
     """
-    global SCRAPE_COUNTER
-    if SCRAPE_COUNTER >= SCRAPE_LIMIT:
-        print("Limit reached! " + url + " skipped!")
-        return []
-    if LOG_PROGRESS:
-        print("Opening----" + url)
-    page = urlopen(url)
+    # https://stardewvalleywiki.com/mediawiki/api.php?action=query&list=categorymembers&cmtitle=category:items&format=json&cmcontinue=subcat|5245534f5552434553|1746
     
-    SCRAPE_COUNTER += 1
-    soup = bs4.BeautifulSoup(page.read(), features="html.parser")
-    groups = soup.find_all(class_="mw-category-group")
-    end_links = set()
+    pageids = set()
     
-    for group in groups:
-        links = group.find_all("a")
-        for link in links:
-            path = link["href"]
-            if "Category:" in path:
-                end_links = end_links.union(get_item_links(urljoin(url, path)))
-            else:
-                end_links.add(urljoin(url, path))
-                
-    if LOG_PROGRESS:
-        print(url + " scraped!")
-    return end_links
+    query = query_categorymembers_from_category(item_page_title)
+    pageids = get_pageids_from_query(query)
+    
+    return pageids
+    
+def query_categorymembers_from_category(category_page_title):
+    api_url = "https://stardewvalleywiki.com/mediawiki/api.php"
+    params = {
+        "action": "query", 
+        "list": "categorymembers", 
+        "cmtitle": item_page_title, 
+        "format": "json"}
+    r = requests.get(api_url, params)
+    return json.loads(r.text)
+    
+def get_pageids_from_query(query):
+    item_page_ids = set()
+    category_members = query["query"]["categorymembers"]
+    for member in category_members:
+        member_title = member["title"]
+        if member_title.startswith("Category:"):
+            item_pageids.union(get_members_from_category(member_title))
+        else:
+            item_pageids.add(member["pageid"])
+            
+    
+    
     
     
 def get_giftable_item_reactions(item_links):
