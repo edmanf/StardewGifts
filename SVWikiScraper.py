@@ -32,14 +32,13 @@ def scrape_items_to_db():
     """
         Returns a list of items
     """
-    category_page_title = "Category:Items"
     
-    item_links = get_item_links(category_page_title)
+    item_links = get_item_pageids()
     gift_reactions = get_giftable_item_reactions_from_links(item_links)
     write_gift_reactions_to_db(gift_reactions)
     
     
-def get_members_from_category(category_page_title):
+def get_item_pageids():
     """ Returns a set of item urls from this url and its sub-categories
     
     An item link is considered any link in the main content body of the
@@ -55,21 +54,25 @@ def get_members_from_category(category_page_title):
     # https://stardewvalleywiki.com/mediawiki/api.php?action=query&list=categorymembers&cmtitle=category:items&format=json&cmcontinue=subcat|5245534f5552434553|1746
     
     pageids = set()
+    category_page_title = "Category:Items"
     
-    query = query_categorymembers_from_category(item_page_title)
+    query = query_categorymembers_from_category(category_page_title)
     pageids = get_pageids_from_query(query)
     
     return pageids
     
-def query_categorymembers_from_category(category_page_title):
+def query_categorymembers_from_category(category_page_title, continueid = None):
     api_url = "https://stardewvalleywiki.com/mediawiki/api.php"
     params = {
         "action": "query", 
         "list": "categorymembers", 
         "cmtitle": item_page_title, 
         "format": "json"}
-    r = requests.get(api_url, params)
-    return json.loads(r.text)
+    if continueid:
+        params["cmcontinue"] = continueid
+        
+    response = requests.get(api_url, params)
+    return json.loads(response.text)
     
 def get_pageids_from_query(query):
     item_page_ids = set()
@@ -81,7 +84,7 @@ def get_pageids_from_query(query):
         else:
             item_pageids.add(member["pageid"])
             
-    
+    return item_pageids
     
     
     
