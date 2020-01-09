@@ -1,45 +1,51 @@
 import requests
 import bs4
+import json
+from SVWikiScraper import GiftReaction
 
 class StardewWikiGetter:
     API_URL = "https://stardewvalleywiki.com/mediawiki/api.php"
     ITEM_PAGE_TITLE = "Category:Items"
     
     def __init__(self, category_page_title):
-        category_page_title = self.category_page_title
+        self.category_page_title = category_page_title
         
     def get_giftable_item_reactions(self):
         item_pageids = self.get_item_pageids()
-        gift_reactions = set()
+        return self.get_giftable_item_reactions_from_item_pageids(
+            item_pageids)
         
-        for pageid in item_pageids:
+    def get_giftable_item_reactions_from_item_pageids(self, pageids):
+        gift_reactions = list()
+        
+        for pageid in pageids:
+            print(pageid)
             page_parse = self.parse(pageid)
-            if isItemGiftable(page_parse):
-                gift_reactions.union(self.get_gift_reactions(page_parse))
+            if self.isItemGiftable(page_parse):
+                gift_reactions.extend(
+                    self.get_gift_reactions(page_parse))
                 
         return gift_reactions
     
     def get_gift_reactions(self, item_page_parse):
-        parse = item_page_parse["parse"]
-        if "text" not in parse:
-            return list()
-            
-        html_content = parse["text"]["*"]
+        reactions = []
+    
+        html_content = item_page_parse["parse"]["text"]["*"]
         html = bs4.BeautifulSoup(html_content, "html.parser")
-        gift_header = soup.find(id="Gifting")
+
+        item = html.find(id="infoboxheader").text.strip("\n ")
+        gift_header = html.find(id="Gifting")
         if not gift_header:
-            # Item is not giftable
-            return list()
-            
-        reactions = list()
+            print("Not a gift")
+            return reactions
         
-        item = soup.find(id="firstHeading").text.strip("\n ")
         rows = gift_header.parent.find_next("table").find_all("tr")
         table_name = rows[0].text.strip("\n ")
         if table_name != "Villager Reactions":
-            # ensuring that page is formatted as expected
-            raise Error("Formatting not as expected")
-        
+            print("NO")
+            return reactions
+            
+
         for row in rows[1:]:
             reaction = row.find("th").text.strip("\n ")
             villagers = [x.text.strip("\n ") for x in row.find_all("div")]
@@ -51,19 +57,23 @@ class StardewWikiGetter:
         
     
     def isItemGiftable(self, item_page_parse):
-        parse = item_page_parse
+        parse = item_page_parse["parse"]
         if "sections" not in parse:
+            print("no sections")
             return False
         
         for section in parse["sections"]:
-            if "line" in section and section["line"] is "Gifting":
+            if "line" in section and section["line"] == "Gifting":
+                print("giftable")
                 return True
+        return False
         
     def get_item_pageids(self):
         """
             Return a set of all pageids for item pages in the
             category being queried.
         """
+        print("opening: " + self.category_page_title)
         query = self.query(self.category_page_title)
         item_pageids = self.get_all_item_pageids_from_query(query)
         
@@ -71,25 +81,27 @@ class StardewWikiGetter:
             query = self.query(
                 self.category_page_title, 
                 query["continue"]["cmcontinue"])
+            print("continuing: " + self.category_page_title)
             item_pageids.union(
                 self.get_all_item_pageids_from_query(query))
             
         return item_pageids
         
-    def get_all_item_pageids_from_query(query):
+    def get_all_item_pageids_from_query(self, query):
         """
             Returns a set of all pageids for item pages 
         """
-        item_page_ids = set()
+        item_pageids = set()
         category_members = query["query"]["categorymembers"]
         for member in category_members:
             member_title = member["title"]
             if member_title.startswith("Category:"):
-                subcat_querier = StardewWikiQuerier(member_title)
+                subcat_querier = StardewWikiGetter(member_title)
                 item_pageids.union(
                     subcat_querier.get_item_pageids())
             else:
                 item_pageids.add(member["pageid"])
+                print(f"{member['pageid']}: + {member_title}")
         
         return item_pageids
         
@@ -98,16 +110,16 @@ class StardewWikiGetter:
             Query the wiki for categorymembers of the given category 
             and return the result.
         """
-        
+
         params = {
             "action": "query", 
             "list": "categorymembers", 
-            "cmtitle": ITEM_PAGE_TITLE, 
+            "cmtitle": category, 
             "format": "json"}
         if continueid:
             params["cmcontinue"] = continueid
             
-        response = requests.get(API_URL, params)
+        response = requests.get(self.API_URL, params)
         return json.loads(response.text)
     
     def parse(self, pageid):
@@ -117,5 +129,5 @@ class StardewWikiGetter:
             "format": "json"
         }
         
-        response = requests.get(API_URL, params)
+        response = requests.get(self.API_URL, params)
         return json.loads(response.text)
