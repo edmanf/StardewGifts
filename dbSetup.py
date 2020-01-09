@@ -8,9 +8,7 @@ def build_items_db(cursor):
 def build_gifts_db(cursor):
     cursor.execute("""CREATE TABLE if not exists gifts
                       (villager text, item text, reaction text,
-                      FOREIGN KEY(villager) references villagers(name),
-                      FOREIGN KEY(item) references items(name),
-                      PRIMARY KEY(villager, item))""")
+                      PRIMARY KEY(villager, item, reaction))""")
 
 def build_villagers_db(cursor):
     cursor.execute("""CREATE TABLE if not exists villagers 
@@ -21,13 +19,14 @@ def build_villagers_db(cursor):
         cursor.execute("INSERT INTO villagers VALUES(?)", (name.strip('\n'),))
     f.close()
     
-    
+def build_all(cursor):
+    build_villagers_db(c)
+    build_items_db(c)
+    build_gifts_db(c)
 
 if __name__ == "__main__":
     conn = sqlite3.connect("SDV.db")
     c = conn.cursor()
-    build_villagers_db(c)
-    build_items_db(c)
     build_gifts_db(c)
     conn.commit()
-conn.close()
+    conn.close()
