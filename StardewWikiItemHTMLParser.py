@@ -1,5 +1,5 @@
 import bs4
-from SVWikiScraper import GiftReaction
+from GiftReaction import GiftReaction
 
 
 class StardewWikiItemHTMLParser:

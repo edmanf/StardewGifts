@@ -1,7 +1,7 @@
 import requests
 import bs4
 import json
-from SVWikiScraper import GiftReaction
+from GiftReaction import GiftReaction
 from StardewWikiItemHTMLParser import StardewWikiItemHTMLParser
 
 class StardewWikiGetter:
