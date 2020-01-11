@@ -1,8 +1,23 @@
 import sqlite3
 import argparse
 import datetime
-from StardewWikiGetter import StardewWikiGetter
-from GiftReaction import GiftReaction
+from StardewGifts.StardewWikiGetter import StardewWikiGetter
+from StardewGifts.GiftReaction import GiftReaction
+
+def main():
+    args = Args()
+    reactions = list()
+    
+    if args.is_from_input_file():
+        reactions = get_gift_reactions_from_textfile(
+            args.get_input_filepath())
+    else:
+        reactions = get_gift_reactions_from_wiki()
+    
+    if args.will_write_to_text():
+        write_reactions_to_textfile(reactions, args.get_output_filename())
+    else:
+        write_reactions_to_db(reactions, args.get_output_filename())
         
 def write_reactions_to_db(reactions, filename):
     conn = sqlite3.connect(f"{filename}.db")
@@ -72,10 +87,10 @@ class Args:
         args = self.parse_args()
         self.input_file = args.i
         self.output_filename = args.o
-        self.will_write_to_text = args.t
+        self.write_to_text = args.t
         
     def will_write_to_text(self):
-        return self.will_write_to_text
+        return self.write_to_text
         
     def is_from_input_file(self):
         return True if self.input_file else False
@@ -115,16 +130,4 @@ class Args:
         
         
 if __name__ == "__main__":
-    args = Args()
-    reactions = list()
-    
-    if args.is_from_input_file:
-        reactions = get_gift_reactions_from_textfile(
-            args.get_input_filepath())
-    else:
-        reactions = get_gift_reactions_from_wiki()
-    
-    if args.will_write_to_text:
-        write_reactions_to_textfile(reactions, args.get_output_filename())
-    else:
-        write_reactions_to_db(reactions, args.get_output_filename())
+    main()

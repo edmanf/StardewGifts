@@ -1,8 +1,7 @@
 import requests
-import bs4
 import json
-from GiftReaction import GiftReaction
-from StardewWikiItemHTMLParser import StardewWikiItemHTMLParser
+from StardewGifts.GiftReaction import GiftReaction
+from StardewGifts.StardewWikiItemHTMLParser import StardewWikiItemHTMLParser
 
 class StardewWikiGetter:
     API_URL = "https://stardewvalleywiki.com/mediawiki/api.php"
