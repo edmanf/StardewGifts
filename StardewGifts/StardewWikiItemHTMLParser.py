@@ -1,5 +1,6 @@
 import bs4
 from StardewGifts.GiftReaction import GiftReaction
+from StardewGifts.StardewItem import StardewItem
 
 
 class StardewWikiItemHTMLParser:
@@ -15,6 +16,8 @@ class StardewWikiItemHTMLParser:
             if "line" in section and section["line"] == "Gifting":
                 return True
         return False
+        
+    
         
     def get_gift_reactions(self):
         reactions = []
@@ -40,3 +43,18 @@ class StardewWikiItemHTMLParser:
                 reactions.append(GiftReaction(villager, item, reaction))
         
         return reactions
+        
+    def get_item(self):
+        parse = self.parse["parse"]["text"]["*"]
+        item = StardewItem()
+        item.name = parse.find(id="infoboxheader").text.strip()
+        
+        
+        sections = parse.find_all(id = "infoboxsection")
+        for section in sections:
+            if section.text.startswith("Source:"):
+                item.source = section.parent.find(id="infoboxdetail").text.strip()
+            elif section.text.startswith("Season:"):
+                item.season = section.parent.find(id="infoboxdetail").text.strip()
+                
+        return item
