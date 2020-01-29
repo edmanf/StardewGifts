@@ -46,11 +46,12 @@ class StardewWikiItemHTMLParser:
         
     def get_item(self):
         parse = self.parse["parse"]["text"]["*"]
+        html = bs4.BeautifulSoup(parse, features="html.parser")
         item = StardewItem()
-        item.name = parse.find(id="infoboxheader").text.strip()
+        item.name = html.find(id="infoboxheader").text.strip()
         
         
-        sections = parse.find_all(id = "infoboxsection")
+        sections = html.find_all(id = "infoboxsection")
         for section in sections:
             if section.text.startswith("Source:"):
                 item.source = section.parent.find(id="infoboxdetail").text.strip()
