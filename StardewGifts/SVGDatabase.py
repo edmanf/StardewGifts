@@ -12,6 +12,11 @@ class SVGDatabase:
         args = [(x.villager, x.item, x.reaction) for x in reactions]
         self.write_list_to_db(statement, args)
         
+    def write_items_to_db(self, items):
+        statement = "INSERT INTO items VALUES(?, ?, ?)"
+        args = [(x.name, x.source, x.season) for x in items]
+        self.write_list_to_db(statement, args)
+        
     def write_list_to_db(self, statement, args):
         for arg in args:
             self.cursor.execute(statement, args)
