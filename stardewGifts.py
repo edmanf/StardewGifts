@@ -3,6 +3,7 @@ import argparse
 import datetime
 from StardewGifts.StardewWikiGetter import StardewWikiGetter
 from StardewGifts.GiftReaction import GiftReaction
+from StardewGifts.SVGDatabase import SVGDatabase
 
 def main():
     args = Args()
@@ -17,18 +18,9 @@ def main():
     if args.will_write_to_text():
         write_reactions_to_textfile(reactions, args.get_output_filename())
     else:
-        write_reactions_to_db(reactions, args.get_output_filename())
+        db = SVGDatabase(args.get_output_filename())
+        db.write_reactions(reactions)
         
-def write_reactions_to_db(reactions, filename):
-    conn = sqlite3.connect(f"{filename}.db")
-    c = conn.cursor()
-    build_gifts_db(c)
-    
-    for reaction in reactions:
-        c.execute("INSERT INTO gifts VALUES(?, ?, ?)", (reaction.villager, reaction.item, reaction.reaction))
-    
-    conn.commit()
-    conn.close()
         
 def write_reactions_to_textfile(reactions, filename):
     f = open(f"{filename}.txt", "w+")
