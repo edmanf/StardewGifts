@@ -51,29 +51,6 @@ def get_gift_reactions_from_textfile(filepath):
         reactions.append(GiftReaction(name, item, reaction))
     return reactions
 
-def build_items_db(cursor):
-    cursor.execute("""CREATE TABLE if not exists items
-                      (name text)""")
-                      
-def build_gifts_db(cursor):
-    cursor.execute("""CREATE TABLE if not exists gifts
-                      (villager text, item text, reaction text,
-                      PRIMARY KEY(villager, item, reaction))""")
-
-def build_villagers_db(cursor):
-    cursor.execute("""CREATE TABLE if not exists villagers 
-               (name text PRIMARY KEY)""")
-    f = open("villagers.txt")
-    names = f.readlines()
-    for name in names:
-        cursor.execute("INSERT INTO villagers VALUES(?)", (name.strip('\n'),))
-    f.close()
-    
-def build_all(cursor):
-    build_villagers_db(c)
-    build_items_db(c)
-    build_gifts_db(c)
-
 class Args:
     def __init__(self):
         args = self.parse_args()
