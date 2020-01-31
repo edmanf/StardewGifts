@@ -3,7 +3,9 @@ from StardewGifts.GiftReaction import GiftReaction
 from StardewGifts.StardewItem import StardewItem
 
 
-class StardewWikiItemHTMLParser:
+class StardewWikiItemParser:
+    """ This class extracts relevant item and gift information from 
+    the results of action=parse in the stardew wiki API """
     def __init__(self, parse):
         self.parse = parse
         

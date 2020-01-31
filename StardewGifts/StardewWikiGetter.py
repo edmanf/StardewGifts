@@ -1,16 +1,18 @@
 import requests
 import json
 from StardewGifts.GiftReaction import GiftReaction
-from StardewGifts.StardewWikiItemHTMLParser import StardewWikiItemHTMLParser
+from StardewGifts.StardewWikiItemParser import StardewWikiItemParser
 
 class StardewWikiGetter:
+    """ This class retrieves information from Stardew wiki webpages """
+
     API_URL = "https://stardewvalleywiki.com/mediawiki/api.php"
     ITEM_PAGE_TITLE = "Category:Items"
     
     limit = 10
     LIMIT_ON = False
     
-    def __init__(self, category_page_title):
+    def __init__(self, category_page_title = self.ITEM_PAGE_TITLE):
         self.category_page_title = category_page_title
         
     def get_giftable_item_reactions(self):
@@ -29,15 +31,47 @@ class StardewWikiGetter:
         gift_reactions = list()
         
         for pageid in pageids:
-            parser = StardewWikiItemHTMLParser(self.parse(pageid))
+            parser = StardewWikiItemParser(self.parse(pageid))
             if parser.isItemGiftable():
                 gift_reactions.extend(
                     parser.get_gift_reactions())
                 print(f"added gift: {pageid}")
                 
-        return gift_reactions
-    
+        return Result(gift_reactions = gift_reactions)
         
+    def get_items(self):
+        item_pageids = self.get_item_pageids()
+        return self.get_items_from_pageids(self, item_pageids)
+        
+    def get_items_from_pageids(self, pageids):
+        items = list()
+        
+        for pageid in pageids:
+            parser = StardewWikiItemParser(self.parse(pageid))
+            items.extend(parser.get_item())
+                
+        return Result(items = items)
+        
+    def get_items_and_gift_reactions(self):
+        item_pageids = self.get_item_pageids()
+        return self.get_items_and_gift_reactions_from_pageids
+        
+    def get_items_and_gift_reactions_from_pageids(self, pageids):
+        # don't use existing get_items_from_pageids() or 
+        # get_giftable_item_reactions_from_item_pageids()
+        # to avoid calling the API twice per pageid
+        
+        items = list()
+        gift_reactions = list()
+        
+        for pageid in pageids:
+            parser = StardewWikiItemParser(self.parse(pageid))
+            items.extend(parser.get_item())
+            if parser.isItemGiftable():
+                gift_reactions.extend(
+                    parser.get_gift_reactions())
+        return Result(items = items, gift_reactions = gift_reactions)
+
     def get_item_pageids(self):
         """
             Return a set of all pageids for item pages in the
@@ -105,3 +139,8 @@ class StardewWikiGetter:
         
         response = requests.get(self.API_URL, params)
         return json.loads(response.text)
+        
+    class Result:
+        def __init__(self, items = None, gift_reactions = None):
+            self.items = items
+            self.gift_reactions = gift_reactions
