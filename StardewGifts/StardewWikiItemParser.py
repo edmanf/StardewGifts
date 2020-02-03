@@ -1,6 +1,6 @@
 import bs4
 from StardewGifts.GiftReaction import GiftReaction
-from StardewGifts.StardewItem import StardewItem
+from StardewGifts.Item import Item
 
 
 class StardewWikiItemParser:
@@ -49,7 +49,7 @@ class StardewWikiItemParser:
     def get_item(self):
         parse = self.parse["parse"]["text"]["*"]
         html = bs4.BeautifulSoup(parse, features="html.parser")
-        item = StardewItem()
+        item = Item()
         item.name = html.find(id="infoboxheader").text.strip()
         
         
