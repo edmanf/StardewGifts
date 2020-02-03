@@ -1,4 +1,4 @@
-class StardewItem:
+class Item:
     def __init__(self, 
             name = None, 
             source = None, 
