@@ -1,7 +1,7 @@
 import sqlite3
 import argparse
 import datetime
-from StardewGifts.StardewWikiGetter import StardewWikiGetter
+from StardewGifts.WikiGetter import WikiGetter
 from StardewGifts.GiftReaction import GiftReaction
 from StardewGifts.SVGDatabase import SVGDatabase
 
@@ -35,7 +35,7 @@ def get_gift_reactions_from_wiki():
     """
         Return a list of gift reactions taken from the stardewvalleywiki
     """
-    getter = StardewWikiGetter(StardewWikiGetter.ITEM_PAGE_TITLE)
+    getter = WikiGetter(WikiGetter.ITEM_PAGE_TITLE)
     return getter.get_giftable_item_reactions()
 
 def get_gift_reactions_from_textfile(filepath):

@@ -3,7 +3,7 @@ import json
 from StardewGifts.GiftReaction import GiftReaction
 from StardewGifts.StardewWikiItemParser import StardewWikiItemParser
 
-class StardewWikiGetter:
+class WikiGetter:
     """ This class retrieves information from Stardew wiki webpages """
 
     API_URL = "https://stardewvalleywiki.com/mediawiki/api.php"
@@ -50,7 +50,7 @@ class StardewWikiGetter:
             parser = StardewWikiItemParser(self.parse(pageid))
             items.append(parser.get_item())
                 
-        return StardewWikiGetter.Result(items = items)
+        return WikiGetter.Result(items = items)
         
     def get_items_and_gift_reactions(self):
         item_pageids = self.get_item_pageids()
@@ -70,7 +70,7 @@ class StardewWikiGetter:
             if parser.isItemGiftable():
                 gift_reactions.extend(
                     parser.get_gift_reactions())
-        return StardewWikiGetter.Result(items = items, gift_reactions = gift_reactions)
+        return WikiGetter.Result(items = items, gift_reactions = gift_reactions)
 
     def get_item_pageids(self):
         """
@@ -103,7 +103,7 @@ class StardewWikiGetter:
         for member in category_members:
             member_title = member["title"]
             if member_title.startswith("Category:"):
-                subcat_querier = StardewWikiGetter(member_title)
+                subcat_querier = WikiGetter(member_title)
                 item_pageids = item_pageids.union(
                     subcat_querier.get_item_pageids())
             else:
