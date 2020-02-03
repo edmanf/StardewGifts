@@ -12,7 +12,7 @@ class StardewWikiGetter:
     limit = 10
     LIMIT_ON = False
     
-    def __init__(self, category_page_title = self.ITEM_PAGE_TITLE):
+    def __init__(self, category_page_title = ITEM_PAGE_TITLE):
         self.category_page_title = category_page_title
         
     def get_giftable_item_reactions(self):
@@ -48,9 +48,9 @@ class StardewWikiGetter:
         
         for pageid in pageids:
             parser = StardewWikiItemParser(self.parse(pageid))
-            items.extend(parser.get_item())
+            items.append(parser.get_item())
                 
-        return Result(items = items)
+        return StardewWikiGetter.Result(items = items)
         
     def get_items_and_gift_reactions(self):
         item_pageids = self.get_item_pageids()
@@ -70,7 +70,7 @@ class StardewWikiGetter:
             if parser.isItemGiftable():
                 gift_reactions.extend(
                     parser.get_gift_reactions())
-        return Result(items = items, gift_reactions = gift_reactions)
+        return StardewWikiGetter.Result(items = items, gift_reactions = gift_reactions)
 
     def get_item_pageids(self):
         """
