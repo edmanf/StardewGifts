@@ -3,7 +3,7 @@ from StardewGifts.GiftReaction import GiftReaction
 from StardewGifts.Item import Item
 
 
-class StardewWikiItemParser:
+class WikiItemParser:
     """ This class extracts relevant item and gift information from 
     the results of action=parse in the stardew wiki API """
     def __init__(self, parse):

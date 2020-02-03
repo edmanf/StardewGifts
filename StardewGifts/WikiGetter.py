@@ -1,7 +1,7 @@
 import requests
 import json
 from StardewGifts.GiftReaction import GiftReaction
-from StardewGifts.StardewWikiItemParser import StardewWikiItemParser
+from StardewGifts.WikiItemParser import WikiItemParser
 
 class WikiGetter:
     """ This class retrieves information from Stardew wiki webpages """
@@ -31,7 +31,7 @@ class WikiGetter:
         gift_reactions = list()
         
         for pageid in pageids:
-            parser = StardewWikiItemParser(self.parse(pageid))
+            parser = WikiItemParser(self.parse(pageid))
             if parser.isItemGiftable():
                 gift_reactions.extend(
                     parser.get_gift_reactions())
@@ -47,7 +47,7 @@ class WikiGetter:
         items = list()
         
         for pageid in pageids:
-            parser = StardewWikiItemParser(self.parse(pageid))
+            parser = WikiItemParser(self.parse(pageid))
             items.append(parser.get_item())
                 
         return WikiGetter.Result(items = items)
@@ -65,7 +65,7 @@ class WikiGetter:
         gift_reactions = list()
         
         for pageid in pageids:
-            parser = StardewWikiItemParser(self.parse(pageid))
+            parser = WikiItemParser(self.parse(pageid))
             items.extend(parser.get_item())
             if parser.isItemGiftable():
                 gift_reactions.extend(
