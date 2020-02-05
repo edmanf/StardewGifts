@@ -1,9 +1,9 @@
 class Item:
     def __init__(self, 
             name = None, 
-            source = None, 
-            season = None):
+            sources = None, 
+            seasons = None):
         
         self.name = name
-        self.source = source
-        self.season = season
+        self.sources = sources
+        self.seasons = seasons

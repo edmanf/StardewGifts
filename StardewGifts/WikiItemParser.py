@@ -56,8 +56,16 @@ class WikiItemParser:
         sections = html.find_all(id = "infoboxsection")
         for section in sections:
             if section.text.startswith("Source:"):
-                item.source = section.parent.find(id="infoboxdetail").text.strip()
+                sources = []
+                links = section.parent.find(id="infoboxdetail").find_all("a")
+                for link in links:
+                    sources.append(link.text.strip())
+                item.sources = sources
             elif section.text.startswith("Season:"):
-                item.season = section.parent.find(id="infoboxdetail").text.strip()
+                links = section.parent.find(id="infoboxdetail").find_all("a")
+                seasons = []
+                for link in links:
+                    seasons.append(link.text.strip())
+                item.seasons = seasons
                 
         return item
