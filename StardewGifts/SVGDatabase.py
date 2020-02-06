@@ -30,15 +30,16 @@ class SVGDatabase:
         args = [(x.name, x.source, x.season) for x in items]
         self.write_list(statement, args)
         
-    def write_sources(self, items):
-        statement = "INSERT INTO {} VALUES(?, ?)" \
-            .format(self.item_sources_table_name)
+    def write_item_attributes(self, items):
+        statement = "INSERT INTO {} VALUES(?, ?, ?)" \ 
+            .format(self.item__attributes_table_name)
+            
         args = []
         for item in items:
-            for source in item.sources:
-                args.append((item.name, source))
-                
-        self.write_list(args)
+            for attribute in item.attributes:
+                for value in item.attributes[attribute]:
+                    args.append(item.name, attribute, value) 
+        self.write_list(statement, args)
                 
         
     def write_list(self, statement, args):
