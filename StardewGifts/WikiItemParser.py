@@ -53,40 +53,54 @@ class WikiItemParser:
         item = Item()
         item.name = html.find(id="infoboxheader").text.strip()
         
-        
         sections = html.find_all(id = "infoboxsection")
         for section in sections:
+            if section.text.startswith("Sell Price"):
+                # Not currently supporting Sell Prices
+                # I believe all Sell Prices are listed at the bottom,
+                # So should not remove any other information
+                break
+                
             section_name = self.get_section_name(section)
-            if section.text.startswith("Source:"):
-                sources = []
-                links = section.parent.find(id="infoboxdetail").find_all("span")
-                for link in links:
-                    sources.append(link.text.strip())
-                item.sources = sources
-            elif section.text.startswith("Season:"):
-                links = section.parent.find(id="infoboxdetail").find_all("span")
-                seasons = []
-                for link in links:
-                    seasons.append(link.text.strip())
-                item.seasons = seasons
+
+
+            if section_name == "XP" or section_name == "Healing Effect":
+                # ignore XP and healing effect for now
+                continue
+            if self.section_is_attribute(section):
+                values = self.get_attribute_values(section)
+                item.attributes[section_name] = values
                 
         return item
         
     def get_attribute_values(self, section):
-        spans = section.parent.find_all("span")
+        """ Returns a list of attribute values from the given section. """
+        details = section.parent.find(id = "infoboxdetail")
+        spans = details.find_all("span")
         values = []
         if spans:
             for span in spans:
                 values.append(span.text.strip())
             return values
             
-        a_tags = section.parent.find_all("a")
-        if a_tags:
-            for a_tag in a_tags:
-                values.append(a_tag.text.strip())
+        li_tags = details.find_all("li")
+        if li_tags:
+            for li in li_tags:
+                values.append(li.text.strip())
             return values
             
-        return [section.text.strip()]
+        a_tags = details.find("a")
+        if a_tags:
+            for a_tag in a_tags:
+                value = a_tag.string.strip()
+                if value == "Seasons":
+                    values.append("All Seasons")
+                else:
+                    values.append(value)
+                
+            return values
+
+        return [section.parent.find(id = "infoboxdetail").text.strip()]
             
         
     def get_section_name(self, section):
@@ -95,6 +109,6 @@ class WikiItemParser:
         # only removing the last :
         return "".join(parts[:-1])
         
-    def is_attribute(self, tag):
-        
+    def section_is_attribute(self, section):
+        return section.text.find(":") != -1
     
