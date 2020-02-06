@@ -1,4 +1,5 @@
 import bs4
+import functools
 from StardewGifts.GiftReaction import GiftReaction
 from StardewGifts.Item import Item
 
@@ -55,6 +56,7 @@ class WikiItemParser:
         
         sections = html.find_all(id = "infoboxsection")
         for section in sections:
+            section_name = self.get_section_name(section)
             if section.text.startswith("Source:"):
                 sources = []
                 links = section.parent.find(id="infoboxdetail").find_all("span")
@@ -69,3 +71,30 @@ class WikiItemParser:
                 item.seasons = seasons
                 
         return item
+        
+    def get_attribute_values(self, section):
+        spans = section.parent.find_all("span")
+        values = []
+        if spans:
+            for span in spans:
+                values.append(span.text.strip())
+            return values
+            
+        a_tags = section.parent.find_all("a")
+        if a_tags:
+            for a_tag in a_tags:
+                values.append(a_tag.text.strip())
+            return values
+            
+        return [section.text.strip()]
+            
+        
+    def get_section_name(self, section):
+        parts = section.text.split(":")
+        # handles the case where an item has : in its name by
+        # only removing the last :
+        return "".join(parts[:-1])
+        
+    def is_attribute(self, tag):
+        
+    
