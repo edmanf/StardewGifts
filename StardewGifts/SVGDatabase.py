@@ -3,17 +3,16 @@ import sqlite3
 class SVGDatabase:
     DEFAULT_GIFT_TABLE_NAME = "gifts"
     DEFAULT_ITEM_TABLE_NAME = "items"
-    DEFAULT_ITEM_SOURCES_TABLE_NAME = "sources"
+    DEFAULT_ITEM_ATTRIBUTES_TABLE_NAME = "item_attributes"
     
     
     def __init__(self, 
         database_path, 
         gift_table_name = self.DEFAULT_GIFT_TABLE_NAME,
-        item_table_name = self.DEFAULT_ITEM_TABLE_NAME
-        item_sources_table_name = self.DEFAULT_ITEM_SOURCES_TABLE_NAME):
+        item_attributes_table_name = self.DEFAULT_ITEM_ATTRIBUTES_TABLE_NAME):
         
         self.gift_table_name = gift_table_name
-        self.item_table_name = item_table_name
+        self.item_attributes_table_name = item__attributes_table_name
         
         self.database_path = database_path
         self.cursor = self.get_cursor()
@@ -72,15 +71,14 @@ class SVGDatabase:
                             PRIMARY KEY(villager, item))""" \ 
                             .format(self.gift_table_name))
                             
-    def build_item_sources_db(cursor):
+    def build_item_attributes_db(cursor):
         cursor.execute("""CREATE TABLE if not exists {}(
-                            item TEXT NOT NULL REFERENCES {}(name), 
-                            source TEXT NOT NULL,
-                            PRIMARY KEY(item, source))""" \
-                            .format(
-                                self.item_sources_table_name,
-                                "name"))
+                            item TEXT NOT NULL, 
+                            attribute TEXT NOT NULL,
+                            value TEXT NOT NULL
+                            PRIMARY KEY(item, attribute, value))""" \
+                            .format(self.item_attributes_table_name))
         
     def build_all():
-        build_items_db()
+        build_item_attributes_db()
         build_gifts_db()
