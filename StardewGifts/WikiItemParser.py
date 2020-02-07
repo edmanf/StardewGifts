@@ -56,18 +56,17 @@ class WikiItemParser:
         sections = html.find_all(id = "infoboxsection")
         for section in sections:
             if section.text.startswith("Sell Price"):
-                # Not currently supporting Sell Prices
-                # I believe all Sell Prices are listed at the bottom,
-                # So should not remove any other information
+                # Special case
+                # Sell price is unsupported because sometimes its
+                # detail is another table, with more sections.
+                # Currently believe all sell prices are listed at the
+                # end, so it is safe to just break
                 break
                 
             section_name = self.get_section_name(section)
 
 
-            if section_name == "XP" or section_name == "Healing Effect":
-                # ignore XP and healing effect for now
-                continue
-            if self.section_is_attribute(section):
+            if self.section_is_supported_attribute(section):
                 values = self.get_attribute_values(section)
                 item.attributes[section_name] = values
                 
@@ -104,11 +103,19 @@ class WikiItemParser:
             
         
     def get_section_name(self, section):
-        parts = section.text.split(":")
+        """ Gets the section name from an infoboxsection. """
+        
         # handles the case where an item has : in its name by
         # only removing the last :
+        parts = section.text.split(":")
         return "".join(parts[:-1])
         
-    def section_is_attribute(self, section):
+    def section_is_supported_attribute(self, section):
+        """ Returns true if the section is a supported attribute. """
+        
+        if (section.text.startswith("XP") or 
+            section.text.startswith("Healing Effect")):
+            return False
+            
         return section.text.find(":") != -1
     
