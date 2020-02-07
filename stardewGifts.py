@@ -8,18 +8,24 @@ from StardewGifts.SVGDatabase import SVGDatabase
 def main():
     args = Args()
     reactions = list()
+    item_attributes = list()
     
     if args.is_from_input_file():
         reactions = get_gift_reactions_from_textfile(
-            args.get_input_filepath())
+            args.get_input_filepath()).gift_reactions
     else:
-        reactions = get_gift_reactions_from_wiki()
+        result = WikiGetter().get_items_and_gift_reactions()
+        reactions = result.gift_reactions
+        item_attributes = result.item_attributes
     
     if args.will_write_to_text():
         write_reactions_to_textfile(reactions, args.get_output_filename())
+        write_item_attributes_to_textfile(item_attributes, "item_attributes.out")
     else:
         db = SVGDatabase(args.get_output_filename())
         db.write_reactions(reactions)
+        db.write_item_attributes(item_attributes)
+        db.commit()
         
         
 def write_reactions_to_textfile(reactions, filename):
@@ -30,13 +36,20 @@ def write_reactions_to_textfile(reactions, filename):
             reaction.item,
             reaction.reaction))
     f.close()
+    
+def write_item_attributes_to_textfile(item_attributes, path):
+    f = open(path, "w+")
+    for item in item_attributes:
+        for att in item.attributes:
+            f.write("{}|||{}|||{}\n".format(item.name, att, item.attributes[att]))
+    f.close()
 
 def get_gift_reactions_from_wiki():
     """
         Return a list of gift reactions taken from the stardewvalleywiki
     """
     getter = WikiGetter(WikiGetter.ITEM_PAGE_TITLE)
-    return getter.get_giftable_item_reactions()
+    return getter.get_giftable_item_reactions().reactions
 
 def get_gift_reactions_from_textfile(filepath):
     """

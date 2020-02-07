@@ -9,8 +9,8 @@ class WikiGetter:
     API_URL = "https://stardewvalleywiki.com/mediawiki/api.php"
     ITEM_PAGE_TITLE = "Category:Items"
     
-    limit = 10
-    LIMIT_ON = False
+    limit = 7
+    LIMIT_ON = True
     
     def __init__(self, category_page_title = ITEM_PAGE_TITLE):
         self.category_page_title = category_page_title
@@ -37,7 +37,7 @@ class WikiGetter:
                     parser.get_gift_reactions())
                 print(f"added gift: {pageid}")
                 
-        return Result(gift_reactions = gift_reactions)
+        return WikiGetter.Result(gift_reactions = gift_reactions)
         
     def get_items(self):
         item_pageids = self.get_item_pageids()
@@ -48,13 +48,14 @@ class WikiGetter:
         
         for pageid in pageids:
             parser = WikiItemParser(self.parse(pageid))
-            items.append(parser.get_item())
+            if parser.isItemGiftable():
+                items.append(parser.get_item())
                 
-        return WikiGetter.Result(items = items)
+        return WikiGetter.Result(item_attributes = items)
         
     def get_items_and_gift_reactions(self):
         item_pageids = self.get_item_pageids()
-        return self.get_items_and_gift_reactions_from_pageids
+        return self.get_items_and_gift_reactions_from_pageids(item_pageids)
         
     def get_items_and_gift_reactions_from_pageids(self, pageids):
         # don't use existing get_items_from_pageids() or 
@@ -66,11 +67,12 @@ class WikiGetter:
         
         for pageid in pageids:
             parser = WikiItemParser(self.parse(pageid))
-            items.extend(parser.get_item())
             if parser.isItemGiftable():
-                gift_reactions.extend(
-                    parser.get_gift_reactions())
-        return WikiGetter.Result(items = items, gift_reactions = gift_reactions)
+                items.append(parser.get_item())
+                if parser.isItemGiftable():
+                    gift_reactions.extend(
+                        parser.get_gift_reactions())
+        return WikiGetter.Result(item_attributes = items, gift_reactions = gift_reactions)
 
     def get_item_pageids(self):
         """
@@ -141,6 +143,6 @@ class WikiGetter:
         return json.loads(response.text)
         
     class Result:
-        def __init__(self, items = None, gift_reactions = None):
-            self.items = items
+        def __init__(self, item_attributes = None, gift_reactions = None):
+            self.item_attributes = item_attributes
             self.gift_reactions = gift_reactions

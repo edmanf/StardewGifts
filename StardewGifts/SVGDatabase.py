@@ -22,7 +22,7 @@ class SVGDatabase:
     
     def write_reactions(self, reactions):
         statement = "INSERT INTO {} VALUES(?, ?, ?)" \
-            .format(self.item_table_name)
+            .format(self.gift_table_name)
         args = [(x.villager, x.item, x.reaction) for x in reactions]
         self.write_list(statement, args)
         
