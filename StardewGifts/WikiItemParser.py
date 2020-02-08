@@ -75,10 +75,25 @@ class WikiItemParser:
         
     def get_attribute_values(self, section):
         """ Returns a list of attribute values from the given section. """
+        
+        
+        """
+            Corner cases:
+                Dinosaur egg source
+                    (<a text>) seperator (<a text>) seperator (<a text>)
+                oak resin source
+                    (<li <a text> <span <img> text>>)
+                    (<li <span <img> <a text>>>)
+                tuna season
+                    (<span <a <img>> <a text>>) separator (<span <a <img>> <a text>>)
+                quartz season
+                    (<span <img> <a text>>) (<span <img> <a text> text>) (<span <img> <a text> text>)
+                maple syrup source
+                    <a text> <span <img> text>
+        
+        """
         details = section.parent.find(id = "infoboxdetail")
         values = []
-        # TODO: handle oak resin source case
-        # li< <a text> <span text>
         
         li_tags = details.find_all("li")
         if li_tags:
@@ -89,12 +104,16 @@ class WikiItemParser:
         spans = details.find_all("span")
         if spans:
             for span in spans:
-                values.append(span.parent.text.strip())
+                if span.previous.string == "Tapper":
+                    # handles the tapper (maple syrup, pine tar) corner case
+                    values.append(span.parent.text.strip())
+                else:
+                    values.append(span.text.strip())
             return values
             
         
             
-        a_tags = details.find("a")
+        a_tags = details.find_all("a")
         if a_tags:
             for a_tag in a_tags:
                 value = a_tag.string.strip()
