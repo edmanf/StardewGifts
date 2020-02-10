@@ -62,7 +62,7 @@ class SVGDatabase:
         self.conn.commit()
         self.conn.close()
 
-    def build_items_db(cursor):
+    def build_items_db(self, cursor):
         cursor.execute("""CREATE TABLE if not exists {}(
                         name TEXT PRIMARY KEY NOT NULL, 
                         source TEXT NOT NULL,
