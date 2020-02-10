@@ -9,7 +9,7 @@ class WikiGetter:
     API_URL = "https://stardewvalleywiki.com/mediawiki/api.php"
     ITEM_PAGE_TITLE = "Category:Items"
     
-    limit = 7
+    limit = 10
     LIMIT_ON = True
     
     def __init__(self, category_page_title = ITEM_PAGE_TITLE):

@@ -33,7 +33,9 @@ class SVGDatabase:
         self.write_list(statement, args)
         
     def write_item_attributes(self, items):
-        statement = "INSERT INTO {} VALUES(?, ?, ?)" \
+        # conflict set to handle catfish season corner case
+        statement = """INSERT INTO {} VALUES(?, ?, ?)
+                        ON CONFLICT DO NOTHING""" \
             .format(self.item_attributes_table_name)
             
         args = []
@@ -41,7 +43,6 @@ class SVGDatabase:
             for attribute in item.attributes:
                 for value in item.attributes[attribute]:
                     arg = (item.name, attribute, value)
-                    print(arg)
                     args.append(arg)
         self.write_list(statement, args)
                 
@@ -51,6 +52,7 @@ class SVGDatabase:
         the args list. """
         
         for arg in args:
+            print(arg)
             self.cursor.execute(statement, arg)
         
     def get_cursor(self):

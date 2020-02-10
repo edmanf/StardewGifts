@@ -90,6 +90,9 @@ class WikiItemParser:
                     (<span <img> <a text>>) (<span <img> <a text> text>) (<span <img> <a text> text>)
                 maple syrup source
                     <a text> <span <img> text>
+                Oil of garlic buff
+                    <a <img>> text <a text>
+                catfish season
         
         """
         details = section.parent.find(id = "infoboxdetail")
@@ -116,7 +119,7 @@ class WikiItemParser:
         a_tags = details.find_all("a")
         if a_tags:
             for a_tag in a_tags:
-                value = a_tag.string.strip()
+                value = a_tag.text.strip()
                 if value == "Seasons":
                     values.append("All Seasons")
                 else:
@@ -139,7 +142,11 @@ class WikiItemParser:
         """ Returns true if the section is a supported attribute. """
         
         if (section.text.startswith("XP") or 
-            section.text.startswith("Healing Effect")):
+            section.text.startswith("Healing") or 
+            section.text.startswith("Buff")):
+            return False
+        if section.find("table"):
+            # sections with tables aren't supported
             return False
             
         return section.text.find(":") != -1
