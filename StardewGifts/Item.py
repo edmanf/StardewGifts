@@ -1,7 +1,6 @@
 class Item:
-    def __init__(self, 
-            name = None, 
-            attributes = None):
-        
+    def __init__(self,
+                 name=None,
+                 attributes=None):
         self.name = name
-        self.attributes = {}
+        self.attributes = attributes
