@@ -1,6 +1,5 @@
 import requests
 import json
-from StardewGifts.GiftReaction import GiftReaction
 from StardewGifts.WikiItemParser import WikiItemParser
 
 
@@ -11,7 +10,7 @@ class WikiGetter:
     ITEM_PAGE_TITLE = "Category:Items"
 
     limit = 10
-    LIMIT_ON = True
+    LIMIT_ON = False
 
     def __init__(self, category_page_title=ITEM_PAGE_TITLE):
         self.category_page_title = category_page_title
@@ -33,7 +32,7 @@ class WikiGetter:
 
         for pageid in pageids:
             parser = WikiItemParser(self.parse(pageid))
-            if parser.isItemGiftable():
+            if parser.is_item_giftable():
                 gift_reactions.extend(
                     parser.get_gift_reactions())
                 print(f"added gift: {pageid}")
@@ -42,14 +41,14 @@ class WikiGetter:
 
     def get_items(self):
         item_pageids = self.get_item_pageids()
-        return self.get_items_from_pageids(self, item_pageids)
+        return self.get_items_from_pageids(item_pageids)
 
     def get_items_from_pageids(self, pageids):
         items = list()
 
         for pageid in pageids:
             parser = WikiItemParser(self.parse(pageid))
-            if parser.isItemGiftable():
+            if parser.is_item_giftable():
                 items.append(parser.get_item())
 
         return WikiGetter.Result(item_attributes=items)
@@ -68,11 +67,10 @@ class WikiGetter:
 
         for pageid in pageids:
             parser = WikiItemParser(self.parse(pageid))
-            if parser.isItemGiftable():
+            if parser.is_item_giftable():
                 items.append(parser.get_item())
-                if parser.isItemGiftable():
-                    gift_reactions.extend(
-                        parser.get_gift_reactions())
+                gift_reactions.extend(
+                    parser.get_gift_reactions())
         return WikiGetter.Result(item_attributes=items, gift_reactions=gift_reactions)
 
     def get_item_pageids(self):

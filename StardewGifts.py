@@ -1,23 +1,23 @@
-import sqlite3
 import argparse
 import datetime
 from StardewGifts.WikiGetter import WikiGetter
 from StardewGifts.GiftReaction import GiftReaction
 from StardewGifts.SVGDatabase import SVGDatabase
 
+
 def main():
     args = Args()
     reactions = list()
     item_attributes = list()
-    
+
     if args.is_from_input_file():
         reactions = get_gift_reactions_from_textfile(
-            args.get_input_filepath()).gift_reactions
+            args.get_input_filepath())
     else:
         result = WikiGetter().get_items_and_gift_reactions()
         reactions = result.gift_reactions
         item_attributes = result.item_attributes
-    
+
     if args.will_write_to_text():
         write_reactions_to_textfile(reactions, args.get_output_filename())
         write_item_attributes_to_textfile(item_attributes, "item_attributes.out")
@@ -26,8 +26,8 @@ def main():
         db.write_reactions(reactions)
         db.write_item_attributes(item_attributes)
         db.commit()
-        
-        
+
+
 def write_reactions_to_textfile(reactions, filename):
     f = open(f"{filename}.txt", "w+")
     for reaction in reactions:
@@ -36,7 +36,8 @@ def write_reactions_to_textfile(reactions, filename):
             reaction.item,
             reaction.reaction))
     f.close()
-    
+
+
 def write_item_attributes_to_textfile(item_attributes, path):
     f = open(path, "w+")
     for item in item_attributes:
@@ -44,12 +45,14 @@ def write_item_attributes_to_textfile(item_attributes, path):
             f.write("{}|||{}|||{}\n".format(item.name, att, item.attributes[att]))
     f.close()
 
+
 def get_gift_reactions_from_wiki():
     """
         Return a list of gift reactions taken from the stardewvalleywiki
     """
     getter = WikiGetter(WikiGetter.ITEM_PAGE_TITLE)
     return getter.get_giftable_item_reactions().reactions
+
 
 def get_gift_reactions_from_textfile(filepath):
     """
@@ -64,25 +67,26 @@ def get_gift_reactions_from_textfile(filepath):
         reactions.append(GiftReaction(name, item, reaction))
     return reactions
 
+
 class Args:
     def __init__(self):
         args = self.parse_args()
         self.input_file = args.i
         self.output_filename = args.o
         self.write_to_text = args.t
-        
+
     def will_write_to_text(self):
         return self.write_to_text
-        
+
     def is_from_input_file(self):
         return True if self.input_file else False
-        
+
     def get_input_filepath(self):
         return self.input_file
-        
+
     def get_output_filename(self):
         return self.output_filename
-        
+
     def parse_args(self):
         description = "Build a database of gifts from the stardew wiki."
         parser = argparse.ArgumentParser(description=description)
@@ -90,26 +94,26 @@ class Args:
         timestamp_format = "%Y%m%d_%H-%M-%S"
         timestamp = datetime.datetime.now().strftime(timestamp_format)
         default_filename_format = f"svgifts_{timestamp}"
-        
+
         parser.add_argument(
-            "-o", 
-            help = "The file to write to.",
-            default = f"{default_filename_format}")
-         
-        help = "Input file of gift reactions. One on each line, in the " + \
-            "NAME|||Item|||Reaction" 
+            "-o",
+            help="The file to write to.",
+            default=f"{default_filename_format}")
+
+        help_statement = "Input file of gift reactions. One on each line, in the " + \
+                         "NAME|||Item|||Reaction"
         parser.add_argument(
             "-i",
-            help = help)
+            help=help_statement)
 
         parser.add_argument(
             "-t",
-            help = "write to a text file instead of a sqlite3 database",
+            help="write to a text file instead of a sqlite3 database",
             action="store_true")
-            
+
         args = parser.parse_args()
         return args
-        
-        
+
+
 if __name__ == "__main__":
     main()

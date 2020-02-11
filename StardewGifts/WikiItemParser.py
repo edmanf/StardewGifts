@@ -1,5 +1,4 @@
 import bs4
-import functools
 from StardewGifts.GiftReaction import GiftReaction
 from StardewGifts.Item import Item
 

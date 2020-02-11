@@ -34,8 +34,8 @@ class SVGDatabase:
 
     def write_item_attributes(self, items):
         # conflict set to handle catfish season corner case
-        statement = """INSERT INTO {} VALUES(?, ?, ?)
-                        ON CONFLICT DO NOTHING""" \
+        statement = """INSERT INTO {} VALUES(?, ?, ?) 
+                    ON CONFLICT DO NOTHING""" \
             .format(self.item_attributes_table_name)
 
         args = []
