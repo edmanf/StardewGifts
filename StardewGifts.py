@@ -8,7 +8,7 @@ from StardewGifts.SVGDatabase import SVGDatabase
 def main():
     args = Args()
     reactions = list()
-    item_attributes = list()
+    items = list()
 
     if args.is_from_input_file():
         reactions = get_gift_reactions_from_textfile(
@@ -16,15 +16,15 @@ def main():
     else:
         result = WikiGetter().get_items_and_gift_reactions()
         reactions = result.gift_reactions
-        item_attributes = result.item_attributes
+        items = result.items
 
     if args.will_write_to_text():
         write_reactions_to_textfile(reactions, args.get_output_filename())
-        write_item_attributes_to_textfile(item_attributes, "item_attributes.out")
+        write_item_attributes_to_textfile(items, "item_attributes.out")
     else:
         db = SVGDatabase(args.get_output_filename())
         db.write_reactions(reactions)
-        db.write_item_attributes(item_attributes)
+        db.write_item_attributes(items)
         db.commit()
 
 
