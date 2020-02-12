@@ -25,9 +25,16 @@ class Test(TestCase):
         self.assertEqual(expected_sources[1], sources[1])
 
     def test_parse(self):
-        ids = [1921, 1961, 2106, 2486, 2716, 3711,
-               5665, 8585, 2489, 3487]
+        ids = [1921, 1961, 2106, 2486, 2716, 3711, 8585, 2489, 3487]
         getter = WikiGetter()
         for id in ids:
-            item = getter.get_items_from_pageids([id])
-            self.assertTrue(item.item_attributes, "{} failed".format(id))
+            result = getter.get_items_from_pageids([id])
+            print(result.item_attributes)
+            self.assertTrue(result.item_attributes, "{} failed".format(id))
+
+    def test_parse_non_giftable(self):
+        pageid = 5665
+
+        result = WikiGetter().get_items_from_pageids([pageid])
+        items = result.item_attributes
+        self.assertFalse(items)
