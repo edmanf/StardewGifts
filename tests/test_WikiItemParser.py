@@ -32,9 +32,12 @@ class Test(TestCase):
             print(result.item_attributes)
             self.assertTrue(result.item_attributes, "{} failed".format(id))
 
-    def test_parse_non_giftable(self):
+    def test_get_non_giftable(self):
         pageid = 5665
 
         result = WikiGetter().get_items_from_pageids([pageid])
         items = result.item_attributes
         self.assertFalse(items)
+
+        item = WikiItemParser(WikiGetter().parse(pageid)).get_item()
+        self.assertTrue(item.attributes)
