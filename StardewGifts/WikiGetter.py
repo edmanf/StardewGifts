@@ -32,7 +32,7 @@ class WikiGetter:
         gift_reactions = list()
 
         for pageid in pageids:
-            parser = WikiItemParser(WikiApiHelper.action_parse(pageid))
+            parser = WikiItemParser(WikiApiHelper.action_parse_pageid(pageid))
             if parser.is_item_giftable():
                 gift_reactions.extend(
                     parser.get_gift_reactions())
@@ -48,7 +48,7 @@ class WikiGetter:
         items = list()
 
         for pageid in pageids:
-            parser = WikiItemParser(WikiApiHelper.action_parse(pageid))
+            parser = WikiItemParser(WikiApiHelper.action_parse_pageid(pageid))
             if parser.is_item_giftable():
                 items.append(parser.get_item())
 
@@ -67,7 +67,7 @@ class WikiGetter:
         gift_reactions = list()
 
         for pageid in pageids:
-            parser = WikiItemParser(WikiApiHelper.action_parse(pageid))
+            parser = WikiItemParser(WikiApiHelper.action_parse_pageid(pageid))
             if parser.is_item_giftable():
                 items.append(parser.get_item())
                 gift_reactions.extend(
@@ -80,11 +80,11 @@ class WikiGetter:
             category being queried.
         """
         print(f"checking {self.category_page_title}")
-        query = WikiApiHelper.action_query(self.category_page_title)
+        query = WikiApiHelper.action_query_category(self.category_page_title)
         item_pageids = self.get_all_item_pageids_from_query(query)
 
         while "continue" in query:
-            query = WikiApiHelper.action_query(
+            query = WikiApiHelper.action_query_category(
                 self.category_page_title,
                 query["continue"]["cmcontinue"])
             new_ids = self.get_all_item_pageids_from_query(query)

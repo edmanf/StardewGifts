@@ -4,7 +4,7 @@ import requests
 API_URL = "https://stardewvalleywiki.com/mediawiki/api.php"
 
 
-def action_query(category, continueid=None):
+def action_query_category(category, continueid=None):
     """
         Query the wiki for categorymembers of the given category
         and return the result.
@@ -22,7 +22,7 @@ def action_query(category, continueid=None):
     return json.loads(response.text)
 
 
-def action_parse(pageid):
+def action_parse_pageid(pageid):
     params = {
         "action": "parse",
         "pageid": pageid,

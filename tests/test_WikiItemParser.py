@@ -11,7 +11,7 @@ class Test(TestCase):
         pageid = 2486  # Oak Resin
 
         getter = WikiGetter()
-        parse = WikiApiHelper.action_parse(pageid)
+        parse = WikiApiHelper.action_parse_pageid(pageid)
         parser = WikiItemParser(parse)
         item = parser.get_item()
         self.assertFalse("XP" in item.attributes)
@@ -40,7 +40,7 @@ class Test(TestCase):
         items = result.items
         self.assertFalse(items)
 
-        item = WikiItemParser(WikiApiHelper.action_parse(pageid)).get_item()
+        item = WikiItemParser(WikiApiHelper.action_parse_pageid(pageid)).get_item()
         self.assertTrue(item.attributes)
 
     def test_get_oak_resin(self):
