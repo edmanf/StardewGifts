@@ -1,6 +1,3 @@
-import requests
-import json
-
 from StardewGifts import WikiApiHelper
 from StardewGifts.WikiItemParser import WikiItemParser
 
@@ -8,13 +5,13 @@ from StardewGifts.WikiItemParser import WikiItemParser
 class WikiGetter:
     """ This class retrieves information from Stardew wiki webpages """
 
-    ITEM_PAGE_TITLE = "Category:Items"
+    CATEGORY_PAGE_TITLES = frozenset(["Category:Items", "Category:Foraging"])
 
     limit = 10
     LIMIT_ON = False
 
-    def __init__(self, category_page_title=ITEM_PAGE_TITLE):
-        self.category_page_title = category_page_title
+    def __init__(self, category_page_titles=CATEGORY_PAGE_TITLES):
+        self.category_page_titles = category_page_titles
 
     def get_giftable_item_reactions(self):
         """
@@ -79,16 +76,18 @@ class WikiGetter:
             Return a set of all pageids for item pages in the
             category being queried.
         """
-        print(f"checking {self.category_page_title}")
-        query = WikiApiHelper.action_query_category(self.category_page_title)
-        item_pageids = self.get_all_item_pageids_from_query(query)
+        item_pageids = set()
+        for category in self.category_page_titles:
+            print(f"checking {category}")
+            query = WikiApiHelper.action_query_category(category)
+            item_pageids = item_pageids.union(self.get_all_item_pageids_from_query(query))
 
-        while "continue" in query:
-            query = WikiApiHelper.action_query_category(
-                self.category_page_title,
-                query["continue"]["cmcontinue"])
-            new_ids = self.get_all_item_pageids_from_query(query)
-            item_pageids = item_pageids.union(new_ids)
+            while "continue" in query:
+                query = WikiApiHelper.action_query_category(
+                    category,
+                    query["continue"]["cmcontinue"])
+                new_ids = self.get_all_item_pageids_from_query(query)
+                item_pageids = item_pageids.union(new_ids)
 
         return item_pageids
 
@@ -105,7 +104,7 @@ class WikiGetter:
         for member in category_members:
             member_title = member["title"]
             if member_title.startswith("Category:"):
-                subcat_querier = WikiGetter(member_title)
+                subcat_querier = WikiGetter(category_page_titles=frozenset([member_title]))
                 item_pageids = item_pageids.union(
                     subcat_querier.get_item_pageids())
             else:

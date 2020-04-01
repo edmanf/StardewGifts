@@ -42,6 +42,11 @@ class WikiItemParser:
             reaction = row.find("th").text.strip("\n ")
             villagers = [x.text.strip("\n ") for x in row.find_all("div")]
             for villager in villagers:
+                if villager == "Dwarf" and item == "Coconut" and reaction == "Dislike":
+                    # Prior to version 1.4, Dwarf had a bug where he reacted negatively to neutral items
+                    # as of 1.4, that has been fixed, but not reflected in the wiki
+                    # TODO: Do something to distinguish between versions
+                    continue
                 reactions.append(GiftReaction(villager, item, reaction))
 
         return reactions
